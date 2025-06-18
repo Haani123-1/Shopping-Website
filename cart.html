@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+
+<body>
+    <h2>Your Cart</h2>
+    <div class="cart-container" id="cart-container"></div>
+    <div class="total" id="total"></div>
+    <style>
+        body {
+            background-color: antiquewhite;
+        }
+
+        .cart-container {
+            display: flex;
+            flex-direction: column;
+            gap: 100px;
+        }
+
+        .item {
+            height: 390px;
+            width: 350px;
+            background-color: cornflowerblue;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            gap: 30px;
+            color: aliceblue;
+            font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+            border-radius: 20px;
+        }
+
+        .item img {
+            height: 120px;
+            width: 200px;
+        }
+    </style>
+    <script>
+        function deletefromcart(index) {
+            const cart = JSON.parse(localStorage.getItem("cart")) || []
+            cart.splice(index, 1)
+            localStorage.setItem("cart", JSON.stringify(cart));
+            loadcart()
+        }
+        function decreasequantity(productId){
+            let cart = JSON.parse(localStorage.getItem("cart")) || []
+            const item = cart.find(p=> p.id  === productId)
+            const index = cart.findIndex(p => p.id === productId)
+            if(item){
+                if(item.quantity > 1){
+                    item.quantity -= 1
+                }
+                else{
+                    cart.splice(index,1)
+                }
+            }
+            localStorage.setItem("cart",JSON.stringify(cart))
+            loadcart()
+            
+        }
+        function loadcart() {
+            const cart = JSON.parse(localStorage.getItem("cart")) || []
+            const container = document.getElementById("cart-container")
+            const totalDiv = document.getElementById("total")
+            if (cart.length === 0) {
+                container.innerHTML = "<p>Your cart is empty.</p>"
+                totalDiv.innerHTML = ""
+                return
+            }
+            let total = 0;
+            container.innerHTML = "";
+            cart.forEach((item, index) => {
+                total += item.price * item.quantity
+                const itemdiv = document.createElement("div")
+                itemdiv.className = "item"
+                itemdiv.innerHTML = `
+        <img src="${item.image}"/>
+        <div class="item-info"><h4>${item.name}</h4>
+        <p class="price">$${item.price * item.quantity}</p>
+        <button class="decrement" onclick="decreasequantity(${item.id})">-</button>
+        <p class="quantity">$${item.quantity}</p>
+        <button class="increment" onclick="increasequantity(${item.id})">+</button>
+    
+        <button class="btn" onclick="deletefromcart(${index})">Delete</button>
+        </div>
+    `
+                container.appendChild(itemdiv)
+            })
+
+            totalDiv.innerHTML = `Total: $${total}`
+        }
+
+        loadcart()
+        function increasequantity(productId) {
+            let cart = JSON.parse(localStorage.getItem("cart")) || []
+            const item = cart.find(p => p.id === productId)
+            if (item) {
+                item.quantity += 1;
+            }
+            localStorage.setItem("cart", JSON.stringify(cart))
+            loadcart()
+        }
+
+    </script>
+
+</body>
+
+</html>
